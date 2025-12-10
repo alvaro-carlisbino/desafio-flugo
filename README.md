@@ -325,7 +325,7 @@ Este projeto foi desenvolvido como parte de um desafio técnico.
 
 ## 👨‍💻 Desenvolvedor
 
-**Álvaro Carlisbino**
+**Alvaro Carlisbino**
 
 Desenvolvedor Full Stack especializado em React, TypeScript e arquiteturas escaláveis.
 
