@@ -15,6 +15,8 @@ import {
   FormControlLabel,
   Switch,
   LinearProgress,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useFormViewModel } from '../../viewmodels/FormViewModel';
@@ -27,6 +29,9 @@ interface EmployeeFormProps {
 }
 
 export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const {
     formData,
     errors,
@@ -55,6 +60,7 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
         startIcon={<ArrowBackIcon />}
         onClick={onCancel}
         sx={{ mb: 3, color: 'text.secondary' }}
+        size={isMobile ? 'small' : 'medium'}
       >
         Voltar para Colaboradores
       </Button>
@@ -70,27 +76,39 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
         </Typography>
       </Box>
 
-      <Stack direction="row" spacing={5}>
-        <Box sx={{ width: 200 }}>
-          <Stepper activeStep={currentStep} orientation="vertical">
-            {steps.map((label, index) => (
-              <Step key={label}>
-                <StepLabel>
-                  <Typography
-                    variant="body2"
-                    fontWeight={index === currentStep ? 600 : 400}
-                    color={index <= currentStep ? 'text.primary' : 'text.secondary'}
-                  >
-                    {label}
-                  </Typography>
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Box>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 5 }}>
+        {!isMobile && (
+          <Box sx={{ width: 200 }}>
+            <Stepper activeStep={currentStep} orientation="vertical">
+              {steps.map((label, index) => (
+                <Step key={label}>
+                  <StepLabel>
+                    <Typography
+                      variant="body2"
+                      fontWeight={index === currentStep ? 600 : 400}
+                      color={index <= currentStep ? 'text.primary' : 'text.secondary'}
+                    >
+                      {label}
+                    </Typography>
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+        )}
 
-        <Paper sx={{ flex: 1, p: 4 }} elevation={0}>
-          <Typography variant="h5" fontWeight="bold" mb={3}>
+        <Paper sx={{ flex: 1, p: { xs: 3, md: 4 } }} elevation={0}>
+          {isMobile && (
+            <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel />
+                </Step>
+              ))}
+            </Stepper>
+          )}
+
+          <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight="bold" mb={3}>
             {initialData ? 'Editar Colaborador' : steps[currentStep]}
           </Typography>
 
@@ -105,6 +123,7 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
                 error={touched.name && Boolean(errors.name)}
                 helperText={touched.name && errors.name}
                 placeholder="Ex: João da Silva"
+                size={isMobile ? 'small' : 'medium'}
               />
 
               <TextField
@@ -117,6 +136,7 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
                 error={touched.email && Boolean(errors.email)}
                 helperText={touched.email && errors.email}
                 placeholder="exemplo@flugo.com"
+                size={isMobile ? 'small' : 'medium'}
               />
 
               <FormControlLabel
@@ -137,6 +157,7 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
               <FormControl
                 fullWidth
                 error={touched.department && Boolean(errors.department)}
+                size={isMobile ? 'small' : 'medium'}
               >
                 <InputLabel>Departamento</InputLabel>
                 <Select
@@ -168,10 +189,18 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
             justifyContent="space-between"
             sx={{ mt: 4, pt: 3, borderTop: '1px solid', borderColor: 'divider' }}
           >
-            <Button onClick={handleBack} color="inherit">
+            <Button
+              onClick={handleBack}
+              color="inherit"
+              size={isMobile ? 'small' : 'medium'}
+            >
               {currentStep === 0 ? 'Cancelar' : 'Voltar'}
             </Button>
-            <Button variant="contained" onClick={nextStep}>
+            <Button
+              variant="contained"
+              onClick={nextStep}
+              size={isMobile ? 'small' : 'medium'}
+            >
               {currentStep === steps.length - 1 ? 'Concluir cadastro' : 'Próximo passo'}
             </Button>
           </Stack>
