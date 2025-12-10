@@ -338,7 +338,8 @@ Desenvolvedor Full Stack especializado em React, TypeScript, Flutter e Golang, c
 ### 📦 Este Projeto
 
 - 🔗 **Repositório**: [github.com/alvaro-carlisbino/desafio-flugo](https://github.com/alvaro-carlisbino/desafio-flugo)
-- 🚀 **Demo ao vivo**: Em breve (deploy na Vercel)
+- 🚀 **Demo ao vivo**: [desafio-flugo-one.vercel.app](https://desafio-flugo-one.vercel.app)
+- ⚙️ **CI/CD**: Deploy automático via Vercel (integrado com GitHub)
 
 ---
 
