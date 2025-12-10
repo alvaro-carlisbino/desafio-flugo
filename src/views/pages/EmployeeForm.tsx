@@ -127,7 +127,7 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
                     color="primary"
                   />
                 }
-                label="Ativar colaborador ao criar"
+                label={formData.active ? "Colaborador ativo" : "Colaborador inativo"}
               />
             </Stack>
           )}
