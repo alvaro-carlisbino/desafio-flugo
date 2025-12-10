@@ -327,7 +327,7 @@ Este projeto foi desenvolvido como parte de um desafio técnico.
 
 **Alvaro Carlisbino**
 
-Desenvolvedor Full Stack especializado em React, TypeScript e arquiteturas escaláveis.
+Desenvolvedor Full Stack especializado em React, TypeScript, Flutter e Golang, com foco em arquiteturas escaláveis e soluções modernas.
 
 ### 🔗 Links Profissionais
 
