@@ -95,8 +95,8 @@ Antes de começar, você precisa ter instalado:
 ### 1. Clone o repositório
 
 ```bash
-git clone <seu-repositorio>
-cd DesafioFlugo
+git clone https://github.com/alvaro-carlisbino/desafio-flugo.git
+cd desafio-flugo
 ```
 
 ### 2. Instale as dependências
@@ -325,8 +325,23 @@ Este projeto foi desenvolvido como parte de um desafio técnico.
 
 ## 👨‍💻 Desenvolvedor
 
-Desenvolvido com ❤️ para o desafio Flugo
+**Álvaro Carlisbino**
+
+Desenvolvedor Full Stack especializado em React, TypeScript e arquiteturas escaláveis.
+
+### 🔗 Links Profissionais
+
+- 💼 [LinkedIn](https://www.linkedin.com/in/alvaro-carlisbino/)
+- 🌐 [Portfolio](https://alvaro-carlisbino.vercel.app/)
+- 💻 [GitHub](https://github.com/alvaro-carlisbino)
+
+### 📦 Este Projeto
+
+- 🔗 **Repositório**: [github.com/alvaro-carlisbino/desafio-flugo](https://github.com/alvaro-carlisbino/desafio-flugo)
+- 🚀 **Demo ao vivo**: Em breve (deploy na Vercel)
 
 ---
 
-**Dúvidas?** Abra uma issue ou entre em contato.
+Desenvolvido com ❤️ e ☕ para o desafio Flugo
+
+**Dúvidas?** Abra uma [issue](https://github.com/alvaro-carlisbino/desafio-flugo/issues) ou entre em contato pelo [LinkedIn](https://www.linkedin.com/in/alvaro-carlisbino/).
