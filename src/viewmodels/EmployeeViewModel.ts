@@ -30,10 +30,11 @@ export const useEmployeeViewModel = () => {
       setError(null);
       const newEmployee = await employeeRepository.create(data);
       setEmployees(prev => [newEmployee, ...prev]);
-    } catch (err) {
-      setError('Erro ao adicionar colaborador');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Erro ao adicionar colaborador';
+      setError(errorMessage);
       console.error('Erro ao adicionar colaborador:', err);
-      throw err;
+      throw new Error(errorMessage);
     }
   };
 
@@ -56,9 +57,22 @@ export const useEmployeeViewModel = () => {
       setEmployees(prev => prev.map(emp =>
         emp.id === id ? { ...emp, ...data } : emp
       ));
-    } catch (err) {
-      setError('Erro ao atualizar colaborador');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Erro ao atualizar colaborador';
+      setError(errorMessage);
       console.error('Erro ao atualizar colaborador:', err);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const deleteMultipleEmployees = async (ids: string[]): Promise<void> => {
+    try {
+      setError(null);
+      await employeeRepository.deleteMultiple(ids);
+      setEmployees(prev => prev.filter(emp => !ids.includes(emp.id)));
+    } catch (err) {
+      setError('Erro ao deletar colaboradores');
+      console.error('Erro ao deletar colaboradores:', err);
       throw err;
     }
   };
@@ -69,6 +83,7 @@ export const useEmployeeViewModel = () => {
     error,
     addEmployee,
     deleteEmployee,
+    deleteMultipleEmployees,
     updateEmployee,
     refreshEmployees: loadEmployees,
   };

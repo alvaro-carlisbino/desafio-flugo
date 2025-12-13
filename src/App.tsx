@@ -1,77 +1,59 @@
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
+import { Toaster } from 'sonner';
 import { theme } from './theme/theme';
-import { MainLayout } from './views/layouts/MainLayout';
-import { EmployeeList } from './views/pages/EmployeeList';
-import { EmployeeForm } from './views/pages/EmployeeForm';
-import { useEmployeeViewModel } from './viewmodels/EmployeeViewModel';
-import { Employee } from './models/Employee';
-
-type View = 'list' | 'form';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { Login } from './views/pages/Login';
+import { Register } from './views/pages/Register';
+import { NotFound } from './views/pages/NotFound';
+import { EmployeePage } from './views/pages/EmployeePage';
+import { DepartmentPage } from './views/pages/DepartmentPage';
 
 function App() {
-  const [currentView, setCurrentView] = useState<View>('list');
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const { employees, addEmployee, updateEmployee, deleteEmployee } = useEmployeeViewModel();
-
-  const handleAddEmployee = async (data: any) => {
-    try {
-      if (editingEmployee) {
-        await updateEmployee(editingEmployee.id, data);
-        setEditingEmployee(null);
-      } else {
-        await addEmployee(data);
-      }
-      setCurrentView('list');
-    } catch (error) {
-      console.error('Erro ao salvar colaborador:', error);
-    }
-  };
-
-  const handleEdit = (employee: Employee) => {
-    setEditingEmployee(employee);
-    setCurrentView('form');
-  };
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este colaborador?')) {
-      try {
-        await deleteEmployee(id);
-      } catch (error) {
-        console.error('Erro ao deletar colaborador:', error);
-      }
-    }
-  };
-
-  const handleCancel = () => {
-    setEditingEmployee(null);
-    setCurrentView('list');
-  };
-
-  const handleAddNew = () => {
-    setEditingEmployee(null);
-    setCurrentView('form');
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <MainLayout onNavigate={() => setCurrentView('list')}>
-        {currentView === 'list' ? (
-          <EmployeeList
-            employees={employees}
-            onAddNew={handleAddNew}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ) : (
-          <EmployeeForm
-            initialData={editingEmployee}
-            onSubmit={handleAddEmployee}
-            onCancel={handleCancel}
-          />
-        )}
-      </MainLayout>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <EmployeePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employees"
+              element={
+                <ProtectedRoute>
+                  <EmployeePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/departments"
+              element={
+                <ProtectedRoute>
+                  <DepartmentPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+      <Toaster 
+        position="top-right"
+        expand={true}
+        richColors
+        closeButton
+      />
     </ThemeProvider>
   );
 }

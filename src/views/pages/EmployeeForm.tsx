@@ -20,17 +20,21 @@ import {
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useFormViewModel } from '../../viewmodels/FormViewModel';
-import { EmployeeFormData, DEPARTMENTS, Employee } from '../../models/Employee';
+import { EmployeeFormData, Employee, HIERARCHY_LEVELS } from '../../models/Employee';
+import { useEmployeeViewModel } from '../../viewmodels/EmployeeViewModel';
+import { useDepartmentViewModel } from '../../viewmodels/DepartmentViewModel';
 
 interface EmployeeFormProps {
   initialData?: Employee | null;
+  employees: Employee[];
   onSubmit: (data: EmployeeFormData) => void;
   onCancel: () => void;
 }
 
-export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormProps) => {
+export const EmployeeForm = ({ initialData, employees, onSubmit, onCancel }: EmployeeFormProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { departments } = useDepartmentViewModel();
 
   const {
     formData,
@@ -43,6 +47,12 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
     previousStep,
     getProgress,
   } = useFormViewModel(onSubmit, initialData);
+
+  const managers = employees.filter(emp => emp.hierarchyLevel === 'gestor' && emp.active);
+  const activeDepartments = departments.filter(dept => {
+    const deptEmployees = employees.filter(emp => dept.employeeIds.includes(emp.id));
+    return deptEmployees.length > 0 || dept.employeeIds.length === 0;
+  });
 
   const steps = ['Informações Básicas', 'Informações Profissionais'];
 
@@ -169,9 +179,9 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
                   <MenuItem value="">
                     <em>Selecione um departamento</em>
                   </MenuItem>
-                  {DEPARTMENTS.map((dept) => (
-                    <MenuItem key={dept} value={dept}>
-                      {dept}
+                  {activeDepartments.map((dept) => (
+                    <MenuItem key={dept.id} value={dept.name}>
+                      {dept.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -181,6 +191,80 @@ export const EmployeeForm = ({ initialData, onSubmit, onCancel }: EmployeeFormPr
                   </Typography>
                 )}
               </FormControl>
+
+              <TextField
+                fullWidth
+                label="Cargo"
+                value={formData.position || ''}
+                onChange={(e) => updateField('position', e.target.value)}
+                placeholder="Ex: Desenvolvedor Frontend"
+                size={isMobile ? 'small' : 'medium'}
+              />
+
+              <TextField
+                fullWidth
+                label="Data de Admissão"
+                type="date"
+                value={formData.admissionDate || ''}
+                onChange={(e) => updateField('admissionDate', e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                size={isMobile ? 'small' : 'medium'}
+              />
+
+              <FormControl fullWidth size={isMobile ? 'small' : 'medium'}>
+                <InputLabel>Nível Hierárquico</InputLabel>
+                <Select
+                  value={formData.hierarchyLevel || ''}
+                  label="Nível Hierárquico"
+                  onChange={(e) => updateField('hierarchyLevel', e.target.value as any)}
+                >
+                  <MenuItem value="">
+                    <em>Selecione um nível</em>
+                  </MenuItem>
+                  {HIERARCHY_LEVELS.map((level) => (
+                    <MenuItem key={level.value} value={level.value}>
+                      {level.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth size={isMobile ? 'small' : 'medium'}>
+                <InputLabel>Gestor Responsável</InputLabel>
+                <Select
+                  value={formData.managerId || ''}
+                  label="Gestor Responsável"
+                  onChange={(e) => updateField('managerId', e.target.value)}
+                  disabled={managers.length === 0}
+                >
+                  <MenuItem value="">
+                    <em>Nenhum gestor</em>
+                  </MenuItem>
+                  {managers.map((manager) => (
+                    <MenuItem key={manager.id} value={manager.id}>
+                      {manager.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {managers.length === 0 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                    Nenhum colaborador com nível de gestor cadastrado
+                  </Typography>
+                )}
+              </FormControl>
+
+              <TextField
+                fullWidth
+                label="Salário Base"
+                type="number"
+                value={formData.baseSalary || ''}
+                onChange={(e) => updateField('baseSalary', e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="Ex: 5000.00"
+                InputProps={{
+                  startAdornment: <Typography sx={{ mr: 1 }}>R$</Typography>,
+                }}
+                size={isMobile ? 'small' : 'medium'}
+              />
             </Stack>
           )}
 

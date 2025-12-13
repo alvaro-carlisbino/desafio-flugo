@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -14,36 +15,75 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
+  Menu,
+  MenuItem,
+  Divider,
 } from '@mui/material';
 import {
   People as PeopleIcon,
   Business as BusinessIcon,
   AccountCircle,
   Menu as MenuIcon,
+  Logout as LogoutIcon,
+  Apartment as ApartmentIcon,
 } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
+import { useEmployeeViewModel } from '../../viewmodels/EmployeeViewModel';
 
 const drawerWidth = 280;
 
 interface MainLayoutProps {
   children: ReactNode;
-  onNavigate: () => void;
 }
 
-export const MainLayout = ({ children, onNavigate }: MainLayoutProps) => {
+export const MainLayout = ({ children }: MainLayoutProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { logout, user } = useAuth();
+  const { employees } = useEmployeeViewModel();
+  
+  const currentEmployee = employees.find(emp => emp.email === user?.email);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+    handleMenuClose();
+  };
+
+  const isActive = (path: string) => location.pathname === path;
+
   const drawerContent = (
     <>
-      <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <BusinessIcon sx={{ color: 'primary.main', fontSize: 28 }} />
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+      <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <BusinessIcon sx={{ color: 'primary.main', fontSize: 32 }} />
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           Flugo
+        </Typography>
+      </Box>
+      
+      <Box sx={{ px: 3, mb: 2 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+          Sistema de Gestão
         </Typography>
       </Box>
 
@@ -51,25 +91,81 @@ export const MainLayout = ({ children, onNavigate }: MainLayoutProps) => {
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
-              onNavigate();
+              navigate('/employees');
               if (isMobile) setMobileOpen(false);
             }}
+            selected={isActive('/employees') || isActive('/')}
             sx={{
-              borderRadius: 1,
+              borderRadius: 2,
+              mb: 1,
+              py: 1.5,
+              '&.Mui-selected': {
+                backgroundColor: 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+                '& .MuiListItemIcon-root': {
+                  color: 'white',
+                },
+                '& .MuiListItemText-primary': {
+                  color: 'white',
+                },
+              },
               '&:hover': {
                 backgroundColor: 'action.hover',
               },
             }}
           >
-            <ListItemIcon>
-              <PeopleIcon sx={{ color: 'text.secondary' }} />
+            <ListItemIcon sx={{ minWidth: 45, justifyContent: 'center' }}>
+              <PeopleIcon sx={{ fontSize: 22 }} />
             </ListItemIcon>
             <ListItemText
               primary="Colaboradores"
               primaryTypographyProps={{
-                fontSize: 14,
-                fontWeight: 500,
-                color: 'text.secondary',
+                fontSize: 15,
+                fontWeight: 600,
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              navigate('/departments');
+              if (isMobile) setMobileOpen(false);
+            }}
+            selected={isActive('/departments')}
+            sx={{
+              borderRadius: 2,
+              py: 1.5,
+              '&.Mui-selected': {
+                backgroundColor: 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+                '& .MuiListItemIcon-root': {
+                  color: 'white',
+                },
+                '& .MuiListItemText-primary': {
+                  color: 'white',
+                },
+              },
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 45, justifyContent: 'center' }}>
+              <ApartmentIcon sx={{ fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Departamentos"
+              primaryTypographyProps={{
+                fontSize: 15,
+                fontWeight: 600,
               }}
             />
           </ListItemButton>
@@ -102,11 +198,53 @@ export const MainLayout = ({ children, onNavigate }: MainLayoutProps) => {
             </IconButton>
           )}
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton>
+          <IconButton onClick={handleMenuOpen}>
             <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
               <AccountCircle />
             </Avatar>
           </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <MenuItem disabled>
+              <Box sx={{ py: 1 }}>
+                {currentEmployee ? (
+                  <>
+                    <Typography variant="body2" fontWeight={600}>
+                      {currentEmployee.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {currentEmployee.position || 'Sem cargo'} • {currentEmployee.department}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {user?.email}
+                    </Typography>
+                  </>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    {user?.email}
+                  </Typography>
+                )}
+              </Box>
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Sair</ListItemText>
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
 
